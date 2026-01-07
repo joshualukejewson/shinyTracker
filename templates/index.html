@@ -11,24 +11,30 @@
       <div class="card">
         <h1>Search for a Pokemon:</h1>
 
-        <form action="/" method="POST">
-          <label for="pokemon_search">Search:</label>
+        <form method="POST">
           <input
             type="text"
-            id="pokemon_search"
             name="pokemon_search"
-            value="{{ query or '' }}"
-            placeholder="Enter a pokemon..."
+            placeholder="Enter Pokémon name"
           />
-          <button type="submit">Search Button</button>
+          <button type="submit" name="search_btn">Search</button>
         </form>
 
         {% if pokemon %}
-        <h1>{{ pokemon.name }}</h1>
-        <img src="{{ pokemon.sprite }}" />
-        <p>Encounters: {{ pokemon.count}}</p>
-        {% else %}
-        <p>Search for a Pokémon to begin!</p>
+        <div>
+          <h2>{{ pokemon.name }}</h2>
+          <img src="{{ pokemon.sprite }}" alt="{{ pokemon.name }}" />
+          <p>Encounters: {{ pokemon.count }}</p>
+
+          <form method="POST">
+            <input
+              type="hidden"
+              name="pokemon_name"
+              value="{{ pokemon.name.lower() }}"
+            />
+            <button type="submit" name="increment_btn">+1 Encounter</button>
+          </form>
+        </div>
         {% endif %}
       </div>
     </div>

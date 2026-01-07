@@ -10,6 +10,8 @@ import poketrack
 
 app = Flask(__name__)
 
+stored_pokemon = {}
+
 """
 Index Route that loads the main page, takes pokemon search input and displays the pokemon to the screen.
 
@@ -17,20 +19,34 @@ Index Route that loads the main page, takes pokemon search input and displays th
 @return: flask.render_template() function.
 """
 
-
 @app.route("/", methods=["GET", "POST"])
 def index():
 
-    pokemon_search = ""
-    pokemon = None
+    pokemon = None  # This is what we pass to the template
 
     if request.method == "POST":
-        pokemon_search = request.form.get("pokemon_search")
-        if pokemon_search:
-            pokemon = poketrack.fetch_pokemon_data(str(pokemon_search).lower())
+
+        # --- SEARCH BUTTON ---
+        if "search_btn" in request.form:
+            pokemon_search = request.form.get("pokemon_search", "").strip().lower()
+            if pokemon_search:
+                # Fetch Pokémon if not already stored
+                if pokemon_search not in stored_pokemon:
+                    fetched_pokemon = poketrack.fetch_pokemon_data(pokemon_search)
+                    stored_pokemon[pokemon_search] = fetched_pokemon
+                # Retrieve from dictionary for rendering
+                pokemon = stored_pokemon[pokemon_search]
+
+        # --- INCREMENT BUTTON ---
+        elif "increment_btn" in request.form:
+            pokemon_name = request.form.get("pokemon_name", "").strip().lower()
+            if pokemon_name and pokemon_name in stored_pokemon:
+                pokemon = stored_pokemon[pokemon_name]
+                pokemon.increment()
+            else:
+                pokemon = None  # Safety fallback
 
     return render_template("index.html", pokemon=pokemon)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
