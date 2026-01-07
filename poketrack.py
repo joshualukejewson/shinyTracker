@@ -14,7 +14,7 @@ class Pokemon:
     def get_count(self):
         return self.count
 
-    def reser_count(self):
+    def reset_count(self):
         self.count = 0
 
     def __str__(self):

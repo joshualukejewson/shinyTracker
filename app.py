@@ -44,7 +44,17 @@ def index():
                 pokemon = stored_pokemon[pokemon_name]
                 pokemon.increment()
             else:
-                pokemon = None  # Safety fallback
+                pokemon = None
+
+        # --- RESET BUTTON ---
+        elif "reset_btn" in request.form:
+            pokemon_name = request.form.get("pokemon_name", "").strip().lower()
+            if pokemon_name and pokemon_name in stored_pokemon:
+                pokemon = stored_pokemon[pokemon_name]
+                pokemon.reset_count()
+            else:
+                pokemon = None
+
 
     return render_template("index.html", pokemon=pokemon)
 
