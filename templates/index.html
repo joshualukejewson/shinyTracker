@@ -22,7 +22,7 @@
 
         {% if pokemon %}
         <div>
-          <h2>{{ pokemon.name }}</h2>
+          <h2>{{ pokemon.name.upper() }}</h2>
           <img src="{{ pokemon.sprite }}" alt="{{ pokemon.name }}" />
           <p>Encounters: {{ pokemon.count }}</p>
 

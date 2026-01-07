@@ -10,7 +10,8 @@ import poketrack
 
 app = Flask(__name__)
 
-stored_pokemon = {}
+stored_pokemon = poketrack.retrieve_pokemon_data()
+print(stored_pokemon)
 
 """
 Index Route that loads the main page, takes pokemon search input and displays the pokemon to the screen.
@@ -32,10 +33,11 @@ def index():
             if pokemon_search:
                 # Fetch Pokémon if not already stored
                 if pokemon_search not in stored_pokemon:
-                    fetched_pokemon = poketrack.fetch_pokemon_data(pokemon_search)
+                    fetched_pokemon = poketrack.fetch_pokemon_data(pokemon_search, 0)
                     stored_pokemon[pokemon_search] = fetched_pokemon
                 # Retrieve from dictionary for rendering
                 pokemon = stored_pokemon[pokemon_search]
+                poketrack.save_data(stored_pokemon)
 
         # --- INCREMENT BUTTON ---
         elif "increment_btn" in request.form:
@@ -43,6 +45,7 @@ def index():
             if pokemon_name and pokemon_name in stored_pokemon:
                 pokemon = stored_pokemon[pokemon_name]
                 pokemon.increment()
+                poketrack.save_data(stored_pokemon)
             else:
                 pokemon = None
 
@@ -52,6 +55,7 @@ def index():
             if pokemon_name and pokemon_name in stored_pokemon:
                 pokemon = stored_pokemon[pokemon_name]
                 pokemon.reset_count()
+                poketrack.save_data(stored_pokemon)
             else:
                 pokemon = None
 
