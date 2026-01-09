@@ -7,6 +7,7 @@ Made by Joshua Luke.
 from flask import Flask, render_template, request, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from user import db, User
 import poketrack
 
 app = Flask(__name__)
@@ -17,25 +18,7 @@ app.secret_key = "naruto_beats_sasuke_as_adults"
 # Configuring an SQL Alchemy DB.
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
-
-# Database Model
-class User(db.Model):
-    # Class Variables
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(25), unique=True, nullable=False)
-    password_hash = db.Column(db.String(150), nullable=False)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-
-
-
-
+db.init_app(app)
 
 
 """
@@ -109,7 +92,7 @@ def register():
     if user:
         return render_template("login.html", error="User already exists.")
     else:
-        new_user = User(username=username)
+        new_user = User(username=username) # type: ignore
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
