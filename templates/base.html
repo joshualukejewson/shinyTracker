@@ -2,11 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Shiny Tracker</title>
-    <link rel="stylesheet" href="static/styles.css" />
-    <title>Pokemon Shiny Tracker Hub</title>
+    <title>{% block title %}Shiny Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <script src="/static/script.js"></script>
   </head>
   <body>
     <header>Made by Joshua Jewson</header>
+
+    <!-- Child content goes here -->
+    {% block body %}{% endblock %}
+
+    <footer>&copy; 2026 Joshua Luke</footer>
   </body>
 </html>
