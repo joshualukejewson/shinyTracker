@@ -7,15 +7,21 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='styles.css') }}"
     />
-    <script src="/static/script.js"></script>
+
   </head>
   <body>
-    <header>Made by Joshua Jewson</header>
-
     <div>
       <nav class="navbar">
-        <a href="{{url_for('index')}}">Home</a>
-        <a href="{{url_for('login')}}">Login</a>
+        <a
+          href="{{url_for('index')}}"
+          class="{% if request.endpoint == 'index' %}active{% endif %}"
+          >Home</a
+        >
+        <a
+          href="{{url_for('login')}}"
+          class="{% if request.endpoint == 'login' %}active{% endif %}"
+          >Login</a
+        >
         <a href="{{url_for('logout')}}">Logout</a>
       </nav>
     </div>
@@ -24,5 +30,6 @@
     {% block body %}{% endblock %}
 
     <footer>&copy; 2026 Joshua Luke</footer>
+    <script src="/static/script.js"></script>
   </body>
 </html>
