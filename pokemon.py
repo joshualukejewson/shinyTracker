@@ -1,6 +1,8 @@
 import requests
 from user import db
 from flask_sqlalchemy import SQLAlchemy
+
+
 class Pokemon(db.Model):
 
     __tablename__ = "userpokemon"

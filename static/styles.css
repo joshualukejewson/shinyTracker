@@ -9,15 +9,15 @@ h1 {
 
 .page {
   display: flex;
-  flex-direction: column;   /* stack vertically */
+  flex-direction: column; /* stack vertically */
   justify-content: center;
   align-items: center;
   height: 100vh;
 }
 
 .logo {
-  width: 75%;        /* 75% of page width */
-  max-width: 750px;  /* optional: stop it getting huge */
+  width: 75%; /* 75% of page width */
+  max-width: 750px; /* optional: stop it getting huge */
   height: auto;
   margin-bottom: 24px;
 }
@@ -29,4 +29,3 @@ h1 {
   background: white;
   text-align: center;
 }
-

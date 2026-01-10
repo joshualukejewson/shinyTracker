@@ -24,6 +24,8 @@ database, incrementing the encounters, and resetting the encounters to 0.
 @params: None
 @returns: flask redirect(login) or flask render_template(index.html)
 """
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if "id" not in session:
@@ -43,7 +45,9 @@ def index():
         # --- INCREMENT BUTTON ---
         elif "increment_btn" in request.form:
             pokemon_name = request.form.get("pokemon_name", "").strip().lower()
-            pokemon = Pokemon.query.filter_by(user_id=session["id"], name=pokemon_name).first()
+            pokemon = Pokemon.query.filter_by(
+                user_id=session["id"], name=pokemon_name
+            ).first()
             if pokemon:
                 pokemon.increment()
                 db.session.commit()
@@ -52,13 +56,17 @@ def index():
         # --- RESET BUTTON ---
         elif "reset_btn" in request.form:
             pokemon_name = request.form.get("pokemon_name", "").strip().lower()
-            pokemon = Pokemon.query.filter_by(user_id=session["id"], name=pokemon_name).first()
+            pokemon = Pokemon.query.filter_by(
+                user_id=session["id"], name=pokemon_name
+            ).first()
             if pokemon:
                 pokemon.reset_count()
                 db.session.commit()
                 pokemon_data = pokemon.to_dict()
 
-    return render_template("index.html", pokemon=pokemon_data, username=session.get("username"))
+    return render_template(
+        "index.html", pokemon=pokemon_data, username=session.get("username")
+    )
 
 
 """
@@ -73,6 +81,8 @@ Handle user login
 @params: None
 @returns: flask redirect(index) or flask render_template(login.html)
 """
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -99,6 +109,8 @@ and if not registers data to the database and redirects to index. If user alread
 @params: None
 @returns: flask redirect(index) or flask render_template(login.html)
 """
+
+
 @app.route("/register", methods=["POST"])
 def register():
     username = request.form.get("username", "").strip()
@@ -107,7 +119,7 @@ def register():
     if user:
         return render_template("login.html", error="User already exists")
     else:
-        new_user = User(username=username) # type: ignore
+        new_user = User(username=username)  # type: ignore
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
@@ -116,6 +128,7 @@ def register():
         session["id"] = new_user.id
         return redirect(url_for("index"))
 
+
 """
 @route: Logout
 Handle user logout removing user data from the active session and reprompts for user login.
@@ -123,11 +136,14 @@ Handle user logout removing user data from the active session and reprompts for 
 @params: None
 @returns: flask redirect(login)
 """
+
+
 @app.route("/logout")
 def logout():
     session.pop("username", None)
     session.pop("id", None)
     return redirect(url_for("login"))
+
 
 # ======= App __init__ =========
 if __name__ == "__main__":
