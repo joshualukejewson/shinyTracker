@@ -1,28 +1,38 @@
 import requests
+from user import db
+from flask_sqlalchemy import SQLAlchemy
 
+class Pokemon(db.Model):
 
-class Pokemon:
-    def __init__(self, name: str, sprite: str, shiny: str, count: int):
-        self.name = name
-        self.sprite = sprite
-        self.sprite_shiny = shiny
-        self.count = count
-        self.shiny = False
+    __tablename__ = "userpokemon"
+    name = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    id_no = db.Column(db.Integer, primary_key=True, nullable=False)
+    default_sprite = db.Column(db.String(100), nullable=False)
+    shiny_sprite = db.Column(db.String(100), nullable=False)
+    shiny = db.Column(db.Boolean, default=False)
+    encounters = db.Column(db.Integer, nullable=False, default=0)
 
     def increment(self):
-        self.count += 1
+        self.encounters += 1
 
     def get_count(self):
-        return self.count
+        return self.encounters
 
     def reset_count(self):
-        self.count = 0
+        self.encounters = 0
 
-    def __str__(self):
-        return f"{self.name} - {self.sprite}"
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "sprite": self.default_sprite,
+            "sprite_shiny": self.shiny_sprite,
+            "count": self.encounters,
+            "shiny": self.shiny,
+        }
 
 
-def fetch_pokemon_data(pokemon_name: str, count: int) -> Pokemon:
+def fetch_pokemon_data(user_id: int, pokemon_name: str) -> Pokemon:
     url = "https://pokeapi.co/api/v2/pokemon/{name}".format(name=pokemon_name)
     response = requests.get(url)
     raw_data = response.json()
@@ -41,41 +51,19 @@ def fetch_pokemon_data(pokemon_name: str, count: int) -> Pokemon:
         front_shiny = raw_data["sprites"]["front_shiny"]
 
     return Pokemon(
-        raw_data["name"].lower(),
-        front_default,
-        front_shiny,
-        count,
+        name=pokemon_name,  # type: ignore
+        user_id=user_id,  # type: ignore
+        default_sprite=front_default,  # type: ignore
+        shiny_sprite=front_shiny,  # type: ignore
     )
 
-def save_data(stored_pokemon):
-    file_path = "static/storedPokemon.txt"
 
-    with open(file_path, "w") as file:
-        for pokemon in stored_pokemon.values():
-            file.write("{name},{count}\n".format(name = pokemon.name, count=pokemon.count))
-
-
-"""
-retrieve_pokemon_data(): is run at the beggining of app launch, creates a stored txt file if it doesnt exist
-and reads the data from the file and stores it in a dictionary.
-
-@param: None
-@return: Dictionary[str, Pokemon]
-"""
-def retrieve_pokemon_data():
-
-    stored_pokemon = {}
-    file_path = "static/storedPokemon.txt"
-    
-    # see if file exists, if it doesn't create one and if it does open it and read the saved pokemon data.
-    try:
-        with open(file_path, "x") as file:
-            pass
-    except FileExistsError:
-        with open(file_path, "r") as file:
-            for line in file:
-                pokemon_name, encounters = line.split(",")
-                stored_pokemon[pokemon_name] = fetch_pokemon_data(pokemon_name, int(encounters))
-
-    return stored_pokemon
-
+def add_pokemon_for_user(user_id, pokemon_name):
+    existing = Pokemon.query.filter_by(user_id=user_id, name=pokemon_name).first()
+    if existing:
+        return existing
+    else:
+        pokemon = fetch_pokemon_data(user_id, pokemon_name)
+        db.session.add(pokemon)
+        db.session.commit()
+        return pokemon
