@@ -1,66 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Shiny Tracker</title>
-    <link rel="stylesheet" href="static/styles.css" />
-    <script src="/static/script.js"></script>
-  </head>
+{% extends "base.html" %} {% block body %}
 
-  <body>
-    <div class="page">
-        <img
-          class="logo"
-          id="pokemon-logo"
-          src="../static/assets/pokemon-23.svg"
-          alt="pokemon logo"
+<div class="page">
+  <img
+    class="logo"
+    id="pokemon-logo"
+    src="../static/assets/pokemon-23.svg"
+    alt="pokemon logo"
+  />
+  {% if username %}
+  <h1>Welcome {{username.capitalize()}}!</h1>
+  {% endif %}
+  <div class="card">
+    <h1>Search for a Pokemon:</h1>
+
+    <form method="POST">
+      <input
+        type="text"
+        name="pokemon_search"
+        placeholder="Enter Pokémon name"
+      />
+      <button type="submit" name="search_btn">Search</button>
+    </form>
+
+    {% if pokemon %}
+    <div>
+      <h2>{{ pokemon.name.capitalize() }}</h2>
+      <img
+        id="pokemon-sprite"
+        src="{{ pokemon.sprite }}"
+        alt="{{ pokemon.name }}"
+        data-normal="{{ pokemon.sprite }}"
+        data-shiny="{{ pokemon.sprite_shiny }}"
+        onclick="toggleShiny(this)"
+        style="cursor: pointer"
+      />
+      <p>Encounters: {{ pokemon.count }}</p>
+
+      <form method="POST">
+        <input
+          type="hidden"
+          name="pokemon_name"
+          value="{{ pokemon.name.lower() }}"
         />
-      <div class="card">
-        <h1>Search for a Pokemon:</h1>
+        <button type="submit" name="increment_btn">+1 Encounter</button>
+      </form>
 
-        <form method="POST">
-          <input
-            type="text"
-            name="pokemon_search"
-            placeholder="Enter Pokémon name"
-          />
-          <button type="submit" name="search_btn">Search</button>
-        </form>
-
-        {% if pokemon %}
-        <div>
-          <h2>{{ pokemon.name.capitalize() }}</h2>
-          <img
-            id="pokemon-sprite"
-            src="{{ pokemon.sprite }}"
-            alt="{{ pokemon.name }}"
-            data-normal="{{ pokemon.sprite }}"
-            data-shiny="{{ pokemon.sprite_shiny }}"
-            onclick="toggleShiny(this)"
-            style="cursor: pointer"
-          />
-          <p>Encounters: {{ pokemon.count }}</p>
-
-          <form method="POST">
-            <input
-              type="hidden"
-              name="pokemon_name"
-              value="{{ pokemon.name.lower() }}"
-            />
-            <button type="submit" name="increment_btn">+1 Encounter</button>
-          </form>
-
-          <form method="POST">
-            <input
-              type="hidden"
-              name="pokemon_name"
-              value="{{ pokemon.name.lower() }}"
-            />
-            <button type="submit" name="reset_btn">Reset</button>
-          </form>
-        </div>
-        {% endif %}
-      </div>
+      <form method="POST">
+        <input
+          type="hidden"
+          name="pokemon_name"
+          value="{{ pokemon.name.lower() }}"
+        />
+        <button type="submit" name="reset_btn">Reset</button>
+      </form>
     </div>
-  </body>
-</html>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

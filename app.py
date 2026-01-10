@@ -20,17 +20,15 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
-
 """
 Index Route that loads the main page, takes pokemon search input and displays the pokemon to the screen.
 @param: None
 @return: flask.render_template() function.
 """
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
-
-    if "username" in session:
-        return redirect(url_for('dashboard'))
 
     pokemon = None  # This is what we pass to the template
 
@@ -68,42 +66,57 @@ def index():
             else:
                 pokemon = None
 
+    if session.get("username"):
+        return render_template("index.html", pokemon=pokemon, username=session["username"])
+    else:
+        return render_template("index.html", pokemon=pokemon)
 
-    return render_template("login.html", pokemon=pokemon)
 
 # Login Route
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["POST", "GET"])
 def login():
-    
-    username = request.form['username']
-    password = request.form['password']
-    user = User.query.filter_by(username=username).first()
-    if user and user.check_password(password):
-        session['username'] = username
-        return redirect(url_for('dashboard'))
+
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            session["username"] = username
+            return redirect(url_for("index"))
+        else:
+            return render_template("login.html")
+
     else:
         return render_template("login.html")
-    
+
+
 @app.route("/register", methods=["POST"])
 def register():
-    username = request.form['username']
-    password = request.form['password']
+    username = request.form["username"]
+    password = request.form["password"]
     user = User.query.filter_by(username=username).first()
     if user:
         return render_template("login.html", error="User already exists.")
     else:
-        new_user = User(username=username) # type: ignore
+        new_user = User(username=username)  # type: ignore
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
-        session['username'] = username
-        return redirect(url_for('dashboard'))
-    
+        session["username"] = username
+        return redirect(url_for("index"))
+
+
 @app.route("/dashboard")
 def dashboard():
     if "username" in session:
-        return render_template("dashboard.html", username=session['username'])
-    return redirect(url_for('index'))
+        return render_template("dashboard.html", username=session["username"])
+    return redirect(url_for("index"))
+
+
+@app.route("/logout")
+def logout():
+    session.pop("username", None)
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":

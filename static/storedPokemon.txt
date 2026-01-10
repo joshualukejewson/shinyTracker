@@ -1,0 +1,2 @@
+dialga,7
+bulbasaur,0
